@@ -10,13 +10,13 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     photo = models.ImageField(upload_to='profile/photos/%Y/%m/%d')
 
- 
+
 def save_profile_oauth_pipline(backend, user, response, *args, **kwargs):
-    if kwargs['is_new'] == True:
+    if kwargs['is_new']:
         photo_url = None
         if backend.name == 'vk-oauth2':
             photo_url = response['photo']
-        
+
         photo = download_image(photo_url)
         ext = urlsplit(photo_url).path
         ext = ext[ext.rfind('.'):]
@@ -25,3 +25,15 @@ def save_profile_oauth_pipline(backend, user, response, *args, **kwargs):
         profile.save()
 
 
+class Sharelist(models.Model):
+    name = models.CharField(max_length=30)
+    users = models.ManyToManyField(User)
+
+
+class Record(models.Model):
+    sharelist = models.ForeignKey(Sharelist, on_delete=models.PROTECT)
+    acquirer = models.ForeignKey(User, related_name='+', on_delete=models.PROTECT)
+    debtor = models.ForeignKey(User, related_name='+', on_delete=models.PROTECT)
+    name = models.CharField(max_length=30)
+    amount = models.DecimalField(max_digits=19, decimal_places=4)
+    datetime = models.DateTimeField()

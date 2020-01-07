@@ -2,9 +2,15 @@ certifi==2019.9.11
 chardet==3.0.4
 defusedxml==0.6.0
 Django==2.2.7
+django-autocomplete-light==3.5.0
+entrypoints==0.3
+flake8==3.7.9
 idna==2.8
+mccabe==0.6.1
 oauthlib==3.1.0
 Pillow==6.2.1
+pycodestyle==2.5.0
+pyflakes==2.1.1
 PyJWT==1.7.1
 python-dotenv==0.10.3
 python3-openid==3.1.0

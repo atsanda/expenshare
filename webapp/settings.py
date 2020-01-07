@@ -35,6 +35,8 @@ ALLOWED_HOSTS = ['expenshare.ru']
 INSTALLED_APPS = [
     'expenshare',
     'social_django',
+    'dal',
+    'dal_select2',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -51,6 +53,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'expenshare.middleware.AuthRequiredMiddleware',
 ]
 
 ROOT_URLCONF = 'webapp.urls'

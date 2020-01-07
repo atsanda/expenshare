@@ -56,9 +56,21 @@
         </nav>
 
         {% block body_content %}
-            <div class="container">
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-3">
+                <div class="p-2 bd-highlight">
+                  <a href="{% url 'sharelists-create' %}">New sharelist</a>
+                </div>
+                {% for sl in sharelists %}
+                  <div class="p-2 bd-highlight">{{ sl.name }}</div>
+                {% endfor %}
+              </div>
+              <div class="col-9">
                 {% block container %}{% endblock %}
+              </div>           
             </div>
+          </div>
         {% endblock %}
 
         {% block foot %}

@@ -20,7 +20,9 @@ import expenshare.views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', expenshare.views.index),
+    path('', expenshare.views.index, name='index'),
     path('logout', LogoutView.as_view(next_page='/'), name='logout'),
     path('', include('social_django.urls', namespace='social')),
+    path('sharelists/create', expenshare.views.SharelistCreate.as_view(), name="sharelists-create"),
+    path('user-autocomplete/', expenshare.views.UserAutocomplete.as_view(), name='user-autocomplete'),
 ]
