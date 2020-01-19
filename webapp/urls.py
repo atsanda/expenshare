@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include   
+from django.urls import path, include 
 from django.contrib.auth.views import LogoutView
 import expenshare.views
 
@@ -24,5 +24,7 @@ urlpatterns = [
     path('logout', LogoutView.as_view(next_page='/'), name='logout'),
     path('social/', include('social_django.urls', namespace='social')),
     path('sharelists/create', expenshare.views.SharelistCreate.as_view(), name="sharelists-create"),
+    path('sharelists/<int:sharelist_id>', expenshare.views.SharelistView.as_view(), name='sharelists-view'),
+    path('sharelists/<int:sharelist_id>/records/create', expenshare.views.RecordCreateView.as_view(), name='records-create'),
     path('user-autocomplete/', expenshare.views.UserAutocomplete.as_view(), name='user-autocomplete'),
 ]

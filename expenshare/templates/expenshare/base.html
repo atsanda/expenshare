@@ -59,11 +59,15 @@
           <div class="container-fluid">
             <div class="row">
               <div class="col-3">
-                <div class="p-2 bd-highlight">
+                <div class="p-2">
                   <a href="{% url 'sharelists-create' %}">New sharelist</a>
                 </div>
                 {% for sl in sharelists %}
-                  <div class="p-2 bd-highlight">{{ sl.name }}</div>
+                  <div class="p-2">
+                     <a href="{% url 'sharelists-view' sharelist_id=sl.id %}">
+                        {{ sl.name }}
+                     </a>
+                  </div>
                 {% endfor %}
               </div>
               <div class="col-9">

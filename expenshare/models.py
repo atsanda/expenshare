@@ -27,13 +27,20 @@ def save_profile_oauth_pipline(backend, user, response, *args, **kwargs):
 
 class Sharelist(models.Model):
     name = models.CharField(max_length=30)
-    users = models.ManyToManyField(User)
+    users = models.ManyToManyField(User, through='SharelistUser')
+
+
+class SharelistUser(models.Model):
+    sharelist = models.ForeignKey(Sharelist, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
 
 
 class Record(models.Model):
-    sharelist = models.ForeignKey(Sharelist, on_delete=models.PROTECT)
-    acquirer = models.ForeignKey(User, related_name='+', on_delete=models.PROTECT)
-    debtor = models.ForeignKey(User, related_name='+', on_delete=models.PROTECT)
     name = models.CharField(max_length=30)
-    amount = models.DecimalField(max_digits=19, decimal_places=4)
     datetime = models.DateTimeField()
+
+
+class Debt(models.Model):
+    sharelist_user = models.ForeignKey(SharelistUser, on_delete=models.PROTECT)
+    record = models.ForeignKey(Record, on_delete=models.PROTECT)
+    amount = models.DecimalField(max_digits=19, decimal_places=4)

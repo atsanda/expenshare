@@ -1,0 +1,33 @@
+{% extends 'expenshare/base.html' %}
+
+{% load static %}
+
+{% block container %}
+  Name:
+    {{ active_sharelist.name }}
+  <br>
+  Participants:
+  {% for p in active_sharelist_users %}
+    {{ p.user.username }}
+  {% endfor %}
+
+  <table>
+    <caption>Debts</caption>
+    <thead>
+        <tr>
+            {% for c in columns %}
+              <td>{{ c }}</td>
+            {% endfor %}
+        </tr>
+    </thead>
+    {% for record_id, debts in records.items %}
+      <tr>
+      {% for sharelist_user, debt_value in debts.items %}
+        <td>{{ debt_value }}</td>
+      {% endfor %}
+      </tr>
+    {% endfor %}
+  </table>
+
+  <a href="{% url 'records-create' sharelist_id %}">New record</a>
+{% endblock %}
