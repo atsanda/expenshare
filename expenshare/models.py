@@ -2,6 +2,7 @@ from urllib.parse import urlsplit
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
+from django.db.models import QuerySet, Count
 from .utils import download_image
 
 
@@ -30,7 +31,15 @@ class Sharelist(models.Model):
     users = models.ManyToManyField(User, through='SharelistUser')
 
 
+class SharelistUserQuerySet(QuerySet):
+    def are_in_the_same_sharelist(self, sharelist_user_ids):
+        res = self.filter(id__in=sharelist_user_ids).aggregate(Count('sharelist', distinct=True))
+        return res['sharelist__count'] == 1
+
+
 class SharelistUser(models.Model):
+    objects = SharelistUserQuerySet.as_manager()
+
     sharelist = models.ForeignKey(Sharelist, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.PROTECT)
 

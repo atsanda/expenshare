@@ -7,6 +7,7 @@ from dal import autocomplete
 from expenshare.forms import SharelistForm, RecordForm
 from django.urls import reverse
 from collections import defaultdict
+from .services import MakeRecord
 
 
 def index(request):
@@ -78,18 +79,12 @@ class RecordCreateView(FormView):
         return RecordForm(sharelist_users, **self.get_form_kwargs())
 
     def form_valid(self, form):
-        data = form.cleaned_data
-        record = Record(
-            name=data['name'],
-            datetime=data['datetime']
+        service = MakeRecord(
+            form.cleaned_data['name'],
+            form.cleaned_data['datetime'],
+            form.cleaned_data['amount'],
+            form.cleaned_data['debitors'],
+            next(filter(lambda sh_u: sh_u.user_id == self.request.user.pk, form.sharelist_users), None).id
             )
-        record.save()
-        
-        # !TODO compute debt here
-        pass
-
-        Debt.objects.bulk_create(
-            [Debt(sharelist_user=sh_u, record=record, amount=data['amount']) for sh_u in form.sharelist_users]
-        )
-
+        service.execute()
         return super().form_valid(form)
