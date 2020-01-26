@@ -1,13 +1,13 @@
 from django.shortcuts import render
 from django.views.generic.edit import CreateView, FormView
 from django.views.generic import TemplateView
-from expenshare.models import Sharelist, Record, SharelistUser, Debt
+from expenshare.models import Sharelist, Credit, Debt
 from django.contrib.auth.models import User
 from dal import autocomplete
-from expenshare.forms import SharelistForm, RecordForm
+from expenshare.forms import SharelistForm, CreditForm
 from django.urls import reverse
 from collections import defaultdict
-from .services import MakeRecord
+from .services import CreditCreateService, CreditsTableGetService
 
 
 def index(request):
@@ -51,40 +51,31 @@ class SharelistView(TemplateView):
         context = super().get_context_data(**kwargs)
         context['sharelists'] = self.request.user.sharelist_set.all()
         context['active_sharelist'] = next(filter(lambda sl: sl.id == context['sharelist_id'], context['sharelists']), None)
-        context['active_sharelist_users'] = SharelistUser.objects.filter(sharelist=context['active_sharelist']).select_related('user')
-
-        debts = Debt.objects.filter(sharelist_user__in=context['active_sharelist_users']).select_related('record').order_by('record').all()
-
-        keys = ['name'] + [u.id for u in context['active_sharelist_users']]
-        records = defaultdict(lambda: dict.fromkeys(keys))
-        for debt in debts:
-            records[debt.record_id]['name'] = debt.record.name
-            records[debt.record_id][debt.sharelist_user_id] = debt.amount
-        context['records'] = dict(records)
-        context['columns'] = ['name'] + [u.user.username for u in context['active_sharelist_users']]
+        
+        service = CreditsTableGetService(context['active_sharelist'].id)
+        context['credits_table'] = service.execute()
         return context
 
 
-class RecordCreateView(FormView):
-    """!TODO check if authorized user is a member of sharelist
-    """
-    template_name = 'expenshare/record_create.html'
-    form_class = RecordForm
+class CreditCreateView(FormView):
+    template_name = 'expenshare/credit_create.html'
+    form_class = CreditForm
 
     def get_success_url(self):
         return reverse('sharelists-view', kwargs={'sharelist_id': self.kwargs['sharelist_id']})
 
     def get_form(self):
-        sharelist_users = SharelistUser.objects.filter(sharelist=self.kwargs['sharelist_id']).select_related('user').all()
-        return RecordForm(sharelist_users, **self.get_form_kwargs())
+        debtors = Sharelist.objects.get(id=self.kwargs['sharelist_id']).users.all()
+        return CreditForm(debtors, **self.get_form_kwargs())
 
     def form_valid(self, form):
-        service = MakeRecord(
+        service = CreditCreateService(
+            self.kwargs['sharelist_id'],
+            form.cleaned_data['debtors'],
+            self.request.user.pk,
             form.cleaned_data['name'],
             form.cleaned_data['datetime'],
-            form.cleaned_data['amount'],
-            form.cleaned_data['debitors'],
-            next(filter(lambda sh_u: sh_u.user_id == self.request.user.pk, form.sharelist_users), None).id
+            form.cleaned_data['amount']
             )
         service.execute()
         return super().form_valid(form)

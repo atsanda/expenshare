@@ -15,19 +15,19 @@
     <caption>Debts</caption>
     <thead>
         <tr>
-            {% for c in columns %}
+            {% for c in credits_table.columns %}
               <td>{{ c }}</td>
             {% endfor %}
         </tr>
     </thead>
-    {% for record_id, debts in records.items %}
+    {% for row in credits_table.rows %}
       <tr>
-      {% for sharelist_user, debt_value in debts.items %}
-        <td>{{ debt_value }}</td>
+      {% for value in row %}
+        <td>{{ value }}</td>
       {% endfor %}
       </tr>
     {% endfor %}
   </table>
 
-  <a href="{% url 'records-create' sharelist_id %}">New record</a>
+  <a href="{% url 'credits-create' sharelist_id %}">New credit</a>
 {% endblock %}

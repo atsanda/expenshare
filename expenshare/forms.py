@@ -16,17 +16,17 @@ class SharelistForm(forms.ModelForm):
         fields = ('__all__')
 
 
-class RecordForm(forms.Form):
+class CreditForm(forms.Form):
     name = forms.CharField(label='Name', max_length=30)
     datetime = forms.DateTimeField(label='Datetime', initial=timezone.now())
     amount = forms.DecimalField(max_digits=19, decimal_places=4)
 
-    def __init__(self, sharelist_users, *args, **kwargs):
+    def __init__(self, debtors, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.sharelist_users = sharelist_users
-        choices = [(u.id, u.user.username) for u in sharelist_users]
+        self.debtors = debtors
+        choices = [(d.id, d.username) for d in debtors]
 
-        self.fields['debitors'] = forms.MultipleChoiceField(
+        self.fields['debtors'] = forms.MultipleChoiceField(
             choices=choices,
             widget=forms.CheckboxSelectMultiple,
             initial=[c[0] for c in choices]
@@ -34,7 +34,5 @@ class RecordForm(forms.Form):
 
     def is_valid(self):
         res = super().is_valid()
-        filtered_users = [u for u in self.sharelist_users if str(u.id) in self.cleaned_data['debitors']]
-        res &= len(filtered_users) == len(self.cleaned_data['debitors'])
-        res &= all([filtered_users[0].sharelist_id == fu.sharelist_id for fu in filtered_users])
+        self.cleaned_data['debtors'] = [int(d) for d in self.cleaned_data['debtors']]
         return res

@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-from .models import Record, Debt, SharelistUser
+from collections import defaultdict
+from .models import Credit, Debt, Sharelist
 
 
 class BaseService(ABC):
@@ -12,37 +13,72 @@ class BaseService(ABC):
         pass
 
 
-class MakeRecord(BaseService):
-    def __init__(self, record_name, record_datetime, amount, sharers, creator_id):
-        self._record_name = record_name
-        self._record_datetime = record_datetime
-        self._amount = amount
-        self._sharers = sharers
-        self._creator_id = type(sharers[0])(creator_id)
+class CreditCreateService(BaseService):
+    def __init__(self, sharelist_id, debtor_ids, creditor_id, credit_name, credit_datetime, credit_amount):
+        self._sharelist_id = sharelist_id
+        self._debtor_ids = debtor_ids
+        self._creditor_id = creditor_id
+        self._credit_name = credit_name
+        self._credit_datetime = credit_datetime
+        self._credit_amount = credit_amount
 
     def execute(self):
         self.validate()
 
-        record = Record(name=self._record_name, datetime=self._record_datetime)
-        record.save()
+        credit = Credit(
+            name=self._credit_name, 
+            datetime=self._credit_datetime, 
+            amount=self._credit_amount,
+            creditor_id=self._creditor_id,
+            sharelist_id=self._sharelist_id)
+        credit.save()
 
-        shrl_usr_to_debt_amnt = self._compute_debts()
+        debtors_to_amount = self._compute_debts()
 
         Debt.objects.bulk_create(
-            [Debt(sharelist_user_id=sh_u_id, record=record, amount=amnt) for sh_u_id, amnt in shrl_usr_to_debt_amnt.items()]
+            [Debt(debtor_id=dbtr_id, credit=credit, amount=amnt) for dbtr_id, amnt in debtors_to_amount.items()]
         )
 
     def validate(self):
-        if not SharelistUser.objects.are_in_the_same_sharelist(self._sharers + [self._creator_id]):
-            raise ValueError('Sharers and creator should be in the same sharelist')
+        if not Sharelist.objects.are_in_sharelist(self._sharelist_id, self._debtor_ids + [self._creditor_id]):
+            raise ValueError('Debtors and creditor should be in the same sharelist')
 
     def _compute_debts(self):
-        debt = self._amount / len(self._sharers)
-        shrl_usr_to_debt_amnt = {u: debt for u in self._sharers}
+        debt = self._credit_amount / len(self._debtor_ids)
+        debtors_to_amount = {u_id: debt for u_id in self._debtor_ids}
+        return debtors_to_amount
 
-        if self._creator_id in shrl_usr_to_debt_amnt:
-            shrl_usr_to_debt_amnt[self._creator_id] -= self._amount
-        else:
-            shrl_usr_to_debt_amnt[self._creator_id] = -self._amount
 
-        return shrl_usr_to_debt_amnt
+class CreditsTableGetService(BaseService):
+
+    def __init__(self, sharelist_id):
+        self.sharelist_id = sharelist_id
+
+    def validate(self):
+        pass
+
+    def _get_row_dict_template(self, keys, defaults):
+        row_dict = dict.fromkeys(keys)
+        for k, default_value in defaults.items():
+            row_dict[k] = default_value
+        return row_dict
+
+    def execute(self):
+        self.validate()
+
+        members = Sharelist.objects.get(id=self.sharelist_id).users.all()
+        members_to_username = {m.id: m.username for m in members}
+        credits = Credit.objects.filter(sharelist_id=self.sharelist_id)
+        debts = Debt.objects.filter(credit__in=credits).select_related('credit')
+
+        columns = ['creditor', 'name'] + [username for _, username in members_to_username.items()]
+        keys = ['creditor', 'name'] + [id for id, _ in members_to_username.items()]
+        defaults = {id: 0 for id, _ in members_to_username.items()}
+        rows = defaultdict(lambda: self._get_row_dict_template(keys, defaults))
+        for debt in debts:
+            rows[debt.credit_id]['creditor'] = members_to_username[debt.credit.creditor_id]
+            rows[debt.credit_id]['name'] = debt.credit.name
+            rows[debt.credit_id][debt.debtor_id] = debt.amount
+
+        rows = [[value for _, value in values_dict.items()] for _, values_dict in rows.items()]
+        return {'columns': columns, 'rows': rows}

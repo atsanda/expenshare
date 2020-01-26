@@ -26,30 +26,39 @@ def save_profile_oauth_pipline(backend, user, response, *args, **kwargs):
         profile.save()
 
 
+class SharelistQuerySet(QuerySet):
+    def are_in_sharelist(self, sharelist_id, user_ids):
+        members = self.get(id=sharelist_id).users.values('id').all()
+        members = [m['id'] for m in members]
+        # in case of duplications
+        user_ids = set(user_ids)
+
+        if len(user_ids) > len(members):
+            return False
+
+        res = True
+        for u in user_ids:
+            res &= (u in members)
+
+        return res
+
+
 class Sharelist(models.Model):
+    objects = SharelistQuerySet.as_manager()
+
     name = models.CharField(max_length=30)
-    users = models.ManyToManyField(User, through='SharelistUser')
+    users = models.ManyToManyField(User)
 
 
-class SharelistUserQuerySet(QuerySet):
-    def are_in_the_same_sharelist(self, sharelist_user_ids):
-        res = self.filter(id__in=sharelist_user_ids).aggregate(Count('sharelist', distinct=True))
-        return res['sharelist__count'] == 1
-
-
-class SharelistUser(models.Model):
-    objects = SharelistUserQuerySet.as_manager()
-
-    sharelist = models.ForeignKey(Sharelist, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.PROTECT)
-
-
-class Record(models.Model):
+class Credit(models.Model):
     name = models.CharField(max_length=30)
     datetime = models.DateTimeField()
+    amount = models.DecimalField(max_digits=19, decimal_places=4)
+    creditor = models.ForeignKey(User, on_delete=models.PROTECT)
+    sharelist = models.ForeignKey(Sharelist, on_delete=models.PROTECT)
 
 
 class Debt(models.Model):
-    sharelist_user = models.ForeignKey(SharelistUser, on_delete=models.PROTECT)
-    record = models.ForeignKey(Record, on_delete=models.PROTECT)
+    debtor = models.ForeignKey(User, on_delete=models.PROTECT)
+    credit = models.ForeignKey(Credit, on_delete=models.PROTECT)
     amount = models.DecimalField(max_digits=19, decimal_places=4)

@@ -25,6 +25,6 @@ urlpatterns = [
     path('social/', include('social_django.urls', namespace='social')),
     path('sharelists/create', expenshare.views.SharelistCreate.as_view(), name="sharelists-create"),
     path('sharelists/<int:sharelist_id>', expenshare.views.SharelistView.as_view(), name='sharelists-view'),
-    path('sharelists/<int:sharelist_id>/records/create', expenshare.views.RecordCreateView.as_view(), name='records-create'),
+    path('sharelists/<int:sharelist_id>/credits/create', expenshare.views.CreditCreateView.as_view(), name='credits-create'),
     path('user-autocomplete/', expenshare.views.UserAutocomplete.as_view(), name='user-autocomplete'),
 ]
