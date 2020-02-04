@@ -156,3 +156,5 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = 'media'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+DEBTS_PER_PAGE = 10

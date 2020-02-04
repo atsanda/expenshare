@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from django.views.generic.edit import CreateView, FormView
 from django.views.generic import TemplateView
+from django.core.paginator import Paginator
+from django.conf import settings
 from expenshare.models import Sharelist, Debt
 from django.contrib.auth.models import User
 from dal import autocomplete
@@ -44,7 +46,16 @@ class SharelistView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['active_sharelist'] = Sharelist.objects.get(id=context['sharelist_id'])
-        context['debts'] = Debt.objects.get_user_debts(self.request.user.pk, context['sharelist_id'])
+
+        paginator = Paginator(
+            Debt.objects.get_user_debts(self.request.user.pk, context['sharelist_id']), 
+            settings.DEBTS_PER_PAGE
+            )
+
+        page_number = self.request.GET.get('page', 1)
+        page_obj = paginator.get_page(page_number)
+        context['paginator'] = paginator
+        context['page_obj'] = page_obj
         return context
 
 
