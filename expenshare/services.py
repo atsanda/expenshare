@@ -47,38 +47,3 @@ class CreditCreateService(BaseService):
         debt = self._credit_amount / len(self._debtor_ids)
         debtors_to_amount = {u_id: debt for u_id in self._debtor_ids}
         return debtors_to_amount
-
-
-class CreditsTableGetService(BaseService):
-
-    def __init__(self, sharelist_id):
-        self.sharelist_id = sharelist_id
-
-    def validate(self):
-        pass
-
-    def _get_row_dict_template(self, keys, defaults):
-        row_dict = dict.fromkeys(keys)
-        for k, default_value in defaults.items():
-            row_dict[k] = default_value
-        return row_dict
-
-    def execute(self):
-        self.validate()
-
-        members = Sharelist.objects.get(id=self.sharelist_id).users.all()
-        members_to_username = {m.id: m.username for m in members}
-        credits = Credit.objects.filter(sharelist_id=self.sharelist_id)
-        debts = Debt.objects.filter(credit__in=credits).select_related('credit')
-
-        columns = ['creditor', 'name'] + [username for _, username in members_to_username.items()]
-        keys = ['creditor', 'name'] + [id for id, _ in members_to_username.items()]
-        defaults = {id: 0 for id, _ in members_to_username.items()}
-        rows = defaultdict(lambda: self._get_row_dict_template(keys, defaults))
-        for debt in debts:
-            rows[debt.credit_id]['creditor'] = members_to_username[debt.credit.creditor_id]
-            rows[debt.credit_id]['name'] = debt.credit.name
-            rows[debt.credit_id][debt.debtor_id] = debt.amount
-
-        rows = [[value for _, value in values_dict.items()] for _, values_dict in rows.items()]
-        return {'columns': columns, 'rows': rows}

@@ -3,31 +3,28 @@
 {% load static %}
 
 {% block container %}
-  Name:
-    {{ active_sharelist.name }}
-  <br>
-  Participants:
-  {% for p in active_sharelist_users %}
-    {{ p.user.username }}
-  {% endfor %}
-
-  <table>
-    <caption>Debts</caption>
-    <thead>
-        <tr>
-            {% for c in credits_table.columns %}
-              <td>{{ c }}</td>
-            {% endfor %}
-        </tr>
-    </thead>
-    {% for row in credits_table.rows %}
-      <tr>
-      {% for value in row %}
-        <td>{{ value }}</td>
-      {% endfor %}
-      </tr>
-    {% endfor %}
-  </table>
-
-  <a href="{% url 'credits-create' sharelist_id %}">New credit</a>
+<div class="row align-items-center my-1">
+  <div class="col-7 col-md-9 col-xl-10">
+    <h2>{{ active_sharelist.name }}</h2>
+  </div>
+  <div class="col-5 col-md-3 col-xl-2">
+      <a class="btn btn-primary btn-block" href="{% url 'credits-create' sharelist_id %}">New credit</a>
+  </div>
+</div>
+{% for debt in debts %}
+<div class="row no-gutters align-items-center py-2 border-bottom-2">
+  <div class="col-2">
+    <img class="img-fluid rounded-circle d-block mx-auto" src="{{ debt.credit.creditor.profile.photo.url }}">
+  </div>
+  <div class="col-7 pl-2">
+    <h5 class="mb-0">{{ debt.credit.name }}</h5>
+    <p class="mb-0">{{ debt.credit.amount }}</p>
+    </div>
+  <div class="col-3">
+    <h4 class="text-right font-weight-bold mb-0">
+      {{ debt.amount }}
+    </h4>
+  </div>
+</div>
+{% endfor %}
 {% endblock %}

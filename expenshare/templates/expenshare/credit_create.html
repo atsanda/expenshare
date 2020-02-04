@@ -1,11 +1,12 @@
 {% extends 'expenshare/base.html' %}
 
 {% load static %}
+{% load crispy_forms_tags %}
 
 {% block container %}
-  <form class="p-2" method='POST'>{% csrf_token %}
-    {{ form.as_p }}
-    <input type='submit' value='Save' />
-  </form>
-{{ form.media }}
+<div class="row">
+  <div class="col-12 pt-2 justify-content-center">
+    {% crispy form %}
+  </div>
+</div>
 {% endblock %}

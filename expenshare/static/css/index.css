@@ -1,0 +1,10 @@
+.create-sharelist-img {
+    height: 30%;
+    width: auto;
+}
+
+.border-bottom-2 {
+    border-bottom-width: 1px; 
+    border-bottom-style: solid;
+    border-bottom-color:#868e96;
+}

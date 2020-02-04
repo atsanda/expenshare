@@ -1,13 +1,21 @@
 from dal import autocomplete
 from django import forms
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Submit
 from expenshare.models import Sharelist
 from django.contrib.auth.models import User
 from django.utils import timezone
 
 
 class SharelistForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper(self)
+        self.helper.form_method = 'post'
+        self.helper.add_input(Submit('submit', 'Create'))
+
     users = forms.ModelMultipleChoiceField(
-        queryset=User.objects.all(),
+        queryset=User.objects,
         widget=autocomplete.ModelSelect2Multiple(url='user-autocomplete', attrs={'data-placeholder': 'Autocomplete ...'})
     )
 
@@ -31,6 +39,10 @@ class CreditForm(forms.Form):
             widget=forms.CheckboxSelectMultiple,
             initial=[c[0] for c in choices]
         )
+
+        self.helper = FormHelper(self)
+        self.helper.form_method = 'post'
+        self.helper.add_input(Submit('submit', 'Create'))
 
     def is_valid(self):
         res = super().is_valid()

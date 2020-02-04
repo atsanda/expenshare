@@ -53,12 +53,23 @@ class Sharelist(models.Model):
 class Credit(models.Model):
     name = models.CharField(max_length=30)
     datetime = models.DateTimeField()
-    amount = models.DecimalField(max_digits=19, decimal_places=4)
+    amount = models.DecimalField(max_digits=19, decimal_places=2)
     creditor = models.ForeignKey(User, on_delete=models.PROTECT)
     sharelist = models.ForeignKey(Sharelist, on_delete=models.PROTECT)
 
 
+class DebtQuerySet(QuerySet):
+    def get_user_debts(self, user_id, sharelist_id, fetch_creditor=True):
+        qs = self.filter(debtor=user_id).select_related('credit').filter(credit__sharelist_id=sharelist_id)
+        if fetch_creditor:
+            qs = qs.select_related('credit__creditor')
+            qs = qs.select_related('credit__creditor__profile')
+        return qs
+
+
 class Debt(models.Model):
+    objects = DebtQuerySet.as_manager()
+
     debtor = models.ForeignKey(User, on_delete=models.PROTECT)
     credit = models.ForeignKey(Credit, on_delete=models.PROTECT)
-    amount = models.DecimalField(max_digits=19, decimal_places=4)
+    amount = models.DecimalField(max_digits=19, decimal_places=2)

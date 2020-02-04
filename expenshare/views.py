@@ -1,13 +1,12 @@
 from django.shortcuts import render
 from django.views.generic.edit import CreateView, FormView
 from django.views.generic import TemplateView
-from expenshare.models import Sharelist, Credit, Debt
+from expenshare.models import Sharelist, Debt
 from django.contrib.auth.models import User
 from dal import autocomplete
 from expenshare.forms import SharelistForm, CreditForm
 from django.urls import reverse
-from collections import defaultdict
-from .services import CreditCreateService, CreditsTableGetService
+from .services import CreditCreateService
 
 
 def index(request):
@@ -23,11 +22,6 @@ class SharelistCreate(CreateView):
     success_url = '/'
     form_class = SharelistForm
 
-    def get_context_data(self, **kwargs):
-        ctx = super(SharelistCreate, self).get_context_data(**kwargs)
-        ctx['sharelists'] = self.request.user.sharelist_set.all()
-        return ctx
-
     def form_valid(self, form, *args, **kwargs):
         # creator is not selected on the client side, thus shoud bw added by default on server side
         form.cleaned_data['users'] |= User.objects.filter(pk=self.request.user.pk)
@@ -40,7 +34,7 @@ class UserAutocomplete(autocomplete.Select2QuerySetView):
 
     def get_queryset(self):
         qs = super().get_queryset()
-        qs = qs.exclude(pk=self.request.user.pk)
+        qs = qs.exclude(pk=self.request.user.pk)[:5]
         return qs
 
 
@@ -49,11 +43,8 @@ class SharelistView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['sharelists'] = self.request.user.sharelist_set.all()
-        context['active_sharelist'] = next(filter(lambda sl: sl.id == context['sharelist_id'], context['sharelists']), None)
-        
-        service = CreditsTableGetService(context['active_sharelist'].id)
-        context['credits_table'] = service.execute()
+        context['active_sharelist'] = Sharelist.objects.get(id=context['sharelist_id'])
+        context['debts'] = Debt.objects.get_user_debts(self.request.user.pk, context['sharelist_id'])
         return context
 
 

@@ -17,6 +17,8 @@ from django.contrib import admin
 from django.urls import path, include 
 from django.contrib.auth.views import LogoutView
 import expenshare.views
+from django.conf.urls.static import static
+from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -28,3 +30,5 @@ urlpatterns = [
     path('sharelists/<int:sharelist_id>/credits/create', expenshare.views.CreditCreateView.as_view(), name='credits-create'),
     path('user-autocomplete/', expenshare.views.UserAutocomplete.as_view(), name='user-autocomplete'),
 ]
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
