@@ -71,5 +71,5 @@ class Debt(models.Model):
     objects = DebtQuerySet.as_manager()
 
     debtor = models.ForeignKey(User, on_delete=models.PROTECT)
-    credit = models.ForeignKey(Credit, on_delete=models.PROTECT)
+    credit = models.ForeignKey(Credit, on_delete=models.PROTECT, related_name='debts')
     amount = models.DecimalField(max_digits=19, decimal_places=2)

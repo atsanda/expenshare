@@ -3,12 +3,12 @@ from django.views.generic.edit import CreateView, FormView
 from django.views.generic import TemplateView
 from django.core.paginator import Paginator
 from django.conf import settings
-from expenshare.models import Sharelist, Debt
+from expenshare.models import Sharelist, Debt, Credit
 from django.contrib.auth.models import User
 from dal import autocomplete
 from expenshare.forms import SharelistForm, CreditForm
 from django.urls import reverse
-from .services import CreditCreateService
+from .services import CreditCreateService, CreditInfoService
 
 
 def index(request):
@@ -59,7 +59,7 @@ class SharelistView(TemplateView):
         return context
 
 
-class CreditCreateView(FormView):
+class CreditCreate(FormView):
     template_name = 'expenshare/credit_create.html'
     form_class = CreditForm
 
@@ -81,3 +81,15 @@ class CreditCreateView(FormView):
             )
         service.execute()
         return super().form_valid(form)
+
+
+class CreditView(TemplateView):
+    template_name = 'expenshare/credit_view.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        service = CreditInfoService(context['sharelist_id'], context['credit_id'], self.request.user.pk)
+        credit_info = service.execute()
+        context['credit_info'] = credit_info
+        return context

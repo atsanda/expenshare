@@ -1,0 +1,45 @@
+{% extends 'expenshare/base.html' %}
+
+{% load static %}
+
+{% block container %}
+<div class="row align-items-center my-1">
+  <div class="col-8 col-md-9 col-xl-10">
+    <h1>
+      {{ credit_info.name }}
+    </h1>
+  </div>
+  <div class="col-4 col-md-3 col-xl-2">
+    <a class="btn btn-primary btn-block" href="#">Edit</a>
+  </div>
+</div>
+<div class="row">
+  <div class="col-12">
+    <p>
+      Price: {{ credit_info.amount }}
+    </p>
+    <p>
+      Datetime: {{ credit_info.datetime }}
+    </p>
+  </div>
+</div>
+<div class="row">
+  <div class="col-12">
+    Debts:
+  </div>
+</div>
+{% for debt in credit_info.debts %}
+<div class="row no-gutters align-items-center py-2 border-bottom-2">
+  <div class="col-2">
+    <img class="img-fluid rounded-circle d-block mx-auto" style="max-height: 50px" src="{{ debt.photo.url }}">
+  </div>
+  <div class="col-3 pl-2">
+    {{ debt.username }}
+  </div>
+  <div class="col-7 text-right pr-2">
+    {{ debt.amount }}
+  </div>
+</div>
+{% endfor %}
+
+{% endblock %}
