@@ -29,6 +29,7 @@ urlpatterns = [
     path('sharelists/<int:sharelist_id>', expenshare.views.SharelistView.as_view(), name='sharelists-view'),
     path('sharelists/<int:sharelist_id>/credits/create', expenshare.views.CreditCreate.as_view(), name='credits-create'),
     path('sharelists/<int:sharelist_id>/credits/<int:credit_id>', expenshare.views.CreditView.as_view(), name='credits-view'),
+    path('sharelists/<int:sharelist_id>/credits/<int:credit_id>/update', expenshare.views.CreditUpdate.as_view(), name='credits-update'),
     path('user-autocomplete/', expenshare.views.UserAutocomplete.as_view(), name='user-autocomplete'),
 ]
 

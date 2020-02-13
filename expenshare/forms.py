@@ -29,10 +29,10 @@ class CreditForm(forms.Form):
     datetime = forms.DateTimeField(label='Datetime', initial=timezone.now())
     amount = forms.DecimalField(max_digits=19, decimal_places=4)
 
-    def __init__(self, debtors, *args, **kwargs):
+    def __init__(self, sharelist_id, button_name, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.debtors = debtors
-        choices = [(d.id, d.username) for d in debtors]
+        self.debtors = Sharelist.objects.get(id=sharelist_id).users.all()
+        choices = [(d.id, d.username) for d in self.debtors]
 
         self.fields['debtors'] = forms.MultipleChoiceField(
             choices=choices,
@@ -42,7 +42,7 @@ class CreditForm(forms.Form):
 
         self.helper = FormHelper(self)
         self.helper.form_method = 'post'
-        self.helper.add_input(Submit('submit', 'Create'))
+        self.helper.add_input(Submit('submit', button_name))
 
     def is_valid(self):
         res = super().is_valid()

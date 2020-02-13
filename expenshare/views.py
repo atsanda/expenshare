@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 from dal import autocomplete
 from expenshare.forms import SharelistForm, CreditForm
 from django.urls import reverse
-from .services import CreditCreateService, CreditInfoService
+from .services import CreditCreateService, CreditInfoService, CreditUpdateService
 
 
 def index(request):
@@ -59,16 +59,27 @@ class SharelistView(TemplateView):
         return context
 
 
-class CreditCreate(FormView):
-    template_name = 'expenshare/credit_create.html'
+class CreditFormView(FormView):
     form_class = CreditForm
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({
+            'sharelist_id': self.kwargs['sharelist_id']
+        })
+        return kwargs
+
+
+class CreditCreate(CreditFormView):
+    template_name = 'expenshare/credit_create.html'
 
     def get_success_url(self):
         return reverse('sharelists-view', kwargs={'sharelist_id': self.kwargs['sharelist_id']})
 
-    def get_form(self):
-        debtors = Sharelist.objects.get(id=self.kwargs['sharelist_id']).users.all()
-        return CreditForm(debtors, **self.get_form_kwargs())
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['button_name'] = 'Create'
+        return kwargs
 
     def form_valid(self, form):
         service = CreditCreateService(
@@ -78,6 +89,46 @@ class CreditCreate(FormView):
             form.cleaned_data['name'],
             form.cleaned_data['datetime'],
             form.cleaned_data['amount']
+            )
+        service.execute()
+        return super().form_valid(form)
+
+
+class CreditUpdate(CreditFormView):
+    template_name = 'expenshare/credit_create.html'
+
+    def get_success_url(self):
+        return reverse(
+            'credits-view',
+            kwargs={
+                'sharelist_id': self.kwargs['sharelist_id'], 
+                'credit_id': self.kwargs['credit_id']}
+            )
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+
+        credit_obj = Credit.objects.filter(id=self.kwargs['credit_id']).prefetch_related('debts').get()
+        data = {
+            'name': credit_obj.name,
+            'datetime': credit_obj.datetime,
+            'amount': credit_obj.amount,
+            'debtors': [d.debtor_id for d in credit_obj.debts.all()]
+        }
+        
+        kwargs['initial'] = data
+        kwargs['button_name'] = 'Update'
+        return kwargs
+
+    def form_valid(self, form):
+        service = CreditUpdateService(
+            self.kwargs['credit_id'],
+            self.kwargs['sharelist_id'],
+            form.cleaned_data['debtors'],
+            self.request.user.pk,
+            form.cleaned_data['name'],
+            form.cleaned_data['datetime'],
+            form.cleaned_data['amount'],
             )
         service.execute()
         return super().form_valid(form)
