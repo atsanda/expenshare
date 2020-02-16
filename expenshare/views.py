@@ -48,8 +48,8 @@ class SharelistView(TemplateView):
         context['active_sharelist'] = Sharelist.objects.get(id=context['sharelist_id'])
 
         paginator = Paginator(
-            Debt.objects.get_user_debts(self.request.user.pk, context['sharelist_id']), 
-            settings.DEBTS_PER_PAGE
+            Credit.objects.get_sharelist_credits_with_user_debt(self.request.user.pk, context['sharelist_id']),
+            settings.DEBTS_PER_PAGE,
             )
 
         page_number = self.request.GET.get('page', 1)

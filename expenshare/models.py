@@ -3,6 +3,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
 from django.db.models import QuerySet, Count
+from django.db.models import Prefetch
 from .utils import download_image
 
 
@@ -50,7 +51,16 @@ class Sharelist(models.Model):
     users = models.ManyToManyField(User)
 
 
+class CreditQuerySet(QuerySet):
+    def get_sharelist_credits_with_user_debt(self, user_id, sharelist_id):
+        usr_debts = Debt.objects.filter(debtor_id=user_id)
+        qs = self.filter(sharelist_id=sharelist_id).select_related('creditor__profile').prefetch_related(Prefetch('debts', usr_debts))
+        return qs
+
+
 class Credit(models.Model):
+    objects = CreditQuerySet.as_manager()
+
     name = models.CharField(max_length=30)
     datetime = models.DateTimeField()
     amount = models.DecimalField(max_digits=19, decimal_places=2)

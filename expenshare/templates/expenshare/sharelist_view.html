@@ -11,20 +11,24 @@
       <a class="btn btn-primary btn-block" href="{% url 'credits-create' sharelist_id %}">New credit</a>
   </div>
 </div>
-{% for debt in page_obj.object_list %}
+{% for credit in page_obj.object_list %}
 <div class="row no-gutters align-items-center py-2 border-bottom-2">
   <div class="col-2">
-    <img class="img-fluid rounded-circle d-block mx-auto" src="{{ debt.credit.creditor.profile.photo.url }}">
+    <img class="img-fluid rounded-circle d-block mx-auto" src="{{ credit.creditor.profile.photo.url }}">
   </div>
   <div class="col-7 pl-2">
-    <a href="{% url 'credits-view' sharelist_id debt.credit.id %}">
-      <h5 class="mb-0">{{ debt.credit.name }}</h5>
+    <a href="{% url 'credits-view' sharelist_id credit.id %}">
+      <h5 class="mb-0">{{ credit.name }}</h5>
     </a>
-    <p class="mb-0">{{ debt.credit.amount }}</p>
+    <p class="mb-0">{{ credit.amount }}</p>
     </div>
   <div class="col-3">
     <h4 class="text-right font-weight-bold mb-0">
-      {{ debt.amount }}
+        {% if credit.debts.exists %}
+            {{ credit.debts.get.amount }}
+        {% else %}
+            0.0
+        {% endif %}
     </h4>
   </div>
 </div>
