@@ -101,6 +101,8 @@ class CreditUpdateService:
         self._credit_amount = credit_amount
 
     def execute(self):
+        self.validate()
+
         credit = Credit.objects.filter(id=self._credit_id).prefetch_related('debts').get()
         debts = credit.debts.all()
         credit_changed = False
@@ -139,7 +141,21 @@ class CreditUpdateService:
             Debt.objects.bulk_update(remain_update, ['amount'])
 
     def validate(self):
-        if not Credit.objects.get(id=self._user_id).creditor_id == self._user_id:
+        if not Credit.objects.is_creator(self._credit_id, self._user_id):
             raise PermissionDenied('User is not authorized to edit this credit')
         if not Sharelist.objects.are_in_sharelist(self._sharelist_id, self._debtor_ids + [self._creditor_id]):
             raise ValueError('Debtors and creditor should be in the same sharelist')
+
+
+class CreditDeleteService(BaseService):
+    def __init__(self, credit_id, user_id):
+        self._credit_id = credit_id
+        self._user_id = user_id
+
+    def execute(self):
+        self.validate()
+        Credit.objects.filter(id=self._credit_id).delete()
+
+    def validate(self):
+        if not Credit.objects.is_creator(self._credit_id, self._user_id):
+            raise PermissionDenied('User is not authorized to delete this credit')

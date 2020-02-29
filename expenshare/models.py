@@ -57,6 +57,9 @@ class CreditQuerySet(QuerySet):
         qs = self.filter(sharelist_id=sharelist_id).select_related('creditor__profile').prefetch_related(Prefetch('debts', usr_debts))
         return qs
 
+    def is_creator(self, pk, user_id):
+        return self.get(id=pk).creditor_id == user_id
+
 
 class Credit(models.Model):
     objects = CreditQuerySet.as_manager()
@@ -81,5 +84,5 @@ class Debt(models.Model):
     objects = DebtQuerySet.as_manager()
 
     debtor = models.ForeignKey(User, on_delete=models.PROTECT)
-    credit = models.ForeignKey(Credit, on_delete=models.PROTECT, related_name='debts')
+    credit = models.ForeignKey(Credit, on_delete=models.CASCADE, related_name='debts')
     amount = models.DecimalField(max_digits=19, decimal_places=2)

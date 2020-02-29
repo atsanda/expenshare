@@ -1,14 +1,17 @@
 from django.shortcuts import render
 from django.views.generic.edit import CreateView, FormView
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, View
 from django.core.paginator import Paginator
 from django.conf import settings
-from expenshare.models import Sharelist, Debt, Credit
+from django.urls import reverse
+from expenshare.models import Sharelist, Credit
 from django.contrib.auth.models import User
 from dal import autocomplete
 from expenshare.forms import SharelistForm, CreditForm
-from django.urls import reverse
-from .services import CreditCreateService, CreditInfoService, CreditUpdateService
+from .services import CreditCreateService, CreditInfoService, \
+    CreditUpdateService, CreditDeleteService
+from django.http import HttpResponseForbidden, JsonResponse
+from django.core.exceptions import PermissionDenied
 
 
 def index(request):
@@ -144,3 +147,23 @@ class CreditView(TemplateView):
         credit_info = service.execute()
         context['credit_info'] = credit_info
         return context
+
+
+class CreditDelete(View):
+    pattern_name = 'sharelists-view'
+
+    def delete(self, request, *args, **kwargs):
+        credit_id = kwargs.pop('credit_id', None)
+
+        service = CreditDeleteService(
+            credit_id,
+            self.request.user.pk,
+            )
+
+        try:
+            service.execute()
+        except PermissionDenied as e:
+            return HttpResponseForbidden(content=str(e))
+
+        url = reverse(self.pattern_name, kwargs=kwargs)
+        return JsonResponse(data={'success_url': url}, status=200)
