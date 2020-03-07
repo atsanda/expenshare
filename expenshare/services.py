@@ -141,7 +141,7 @@ class CreditUpdateService:
             Debt.objects.bulk_update(remain_update, ['amount'])
 
     def validate(self):
-        if not Credit.objects.is_creator(self._credit_id, self._user_id):
+        if not Credit.objects.is_creator(self._credit_id, self._creditor_id):
             raise PermissionDenied('User is not authorized to edit this credit')
         if not Sharelist.objects.are_in_sharelist(self._sharelist_id, self._debtor_ids + [self._creditor_id]):
             raise ValueError('Debtors and creditor should be in the same sharelist')
