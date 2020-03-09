@@ -4,6 +4,8 @@ from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
 from django.db.models import QuerySet, Count
 from django.db.models import Prefetch
+from django.db.models import Sum, Q
+from django.db.models.functions import Coalesce
 from .utils import download_image
 
 
@@ -42,6 +44,16 @@ class SharelistQuerySet(QuerySet):
             res &= (u in members)
 
         return res
+
+    def get_total_credits(self, user_id):
+        credit_sum = Coalesce(Sum('credit__amount', filter=Q(credit__creditor=user_id)), 0.0)
+        total_credits = self.values('id').annotate(total_credit=credit_sum).values('id', 'total_credit')
+        return {c['id']: c['total_credit'] for c in total_credits}
+
+    def get_total_debts(self, user_id):
+        debt_sum = Coalesce(Sum('credit__debts__amount', filter=Q(credit__debts__debtor=user_id)), 0.0)
+        total_debts = Sharelist.objects.values('id').annotate(total_debt=debt_sum).values('id', 'total_debt')
+        return {d['id']: d['total_debt'] for d in total_debts}
 
 
 class Sharelist(models.Model):

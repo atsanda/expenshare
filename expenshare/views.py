@@ -15,8 +15,17 @@ from django.core.exceptions import PermissionDenied
 
 
 def index(request):
+    sharelists = Sharelist.objects.order_by('id').all()
+    total_credits = Sharelist.objects.get_total_credits(request.user.id)
+    total_debts = Sharelist.objects.get_total_debts(request.user.id)
+
+    for sh in sharelists:
+        sh.total_credit = total_credits[sh.id]
+        sh.total_debt = total_debts[sh.id]
+        sh.balance = sh.total_credit - sh.total_debt
+
     context = {
-      'sharelists': request.user.sharelist_set.all()
+      'sharelists': sharelists
     }
     return render(request, 'expenshare/index.html', context=context)
 
