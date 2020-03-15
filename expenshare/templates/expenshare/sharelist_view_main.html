@@ -1,16 +1,6 @@
-{% extends 'expenshare/base.html' %}
+{% extends 'expenshare/sharelist_view_base.html' %}
 
-{% load static %}
-
-{% block container %}
-<div class="row align-items-center my-1">
-  <div class="col-7 col-md-9 col-xl-10">
-    <h2>{{ active_sharelist.name }}</h2>
-  </div>
-  <div class="col-5 col-md-3 col-xl-2">
-      <a class="btn btn-primary btn-block" href="{% url 'credits-create' sharelist_id %}">New credit</a>
-  </div>
-</div>
+{% block content %}
 {% for credit in page_obj.object_list %}
 <div class="row no-gutters align-items-center py-2 border-bottom-2">
   <div class="col-2">

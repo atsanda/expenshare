@@ -4,7 +4,7 @@ from django.views.generic import TemplateView, View
 from django.core.paginator import Paginator
 from django.conf import settings
 from django.urls import reverse
-from expenshare.models import Sharelist, Credit
+from expenshare.models import Sharelist, Credit, Debt
 from django.contrib.auth.models import User
 from dal import autocomplete
 from expenshare.forms import SharelistForm, CreditForm
@@ -12,6 +12,7 @@ from .services import CreditCreateService, CreditInfoService, \
     CreditUpdateService, CreditDeleteService
 from django.http import HttpResponseForbidden, JsonResponse
 from django.core.exceptions import PermissionDenied
+from decimal import Decimal
 
 
 def index(request):
@@ -52,8 +53,9 @@ class UserAutocomplete(autocomplete.Select2QuerySetView):
         return qs
 
 
-class SharelistView(TemplateView):
-    template_name = 'expenshare/sharelist_view.html'
+class SharelistMain(TemplateView):
+    template_name = 'expenshare/sharelist_view_main.html'
+    nbar = 'main'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -68,6 +70,38 @@ class SharelistView(TemplateView):
         page_obj = paginator.get_page(page_number)
         context['paginator'] = paginator
         context['page_obj'] = page_obj
+        context['nbar'] = self.nbar
+        return context
+
+
+class SharelistSummary(TemplateView):
+    template_name = 'expenshare/sharelist_view_summary.html'
+    nbar = 'summary'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['active_sharelist'] = Sharelist.objects.get(id=context['sharelist_id'])
+
+        member_to_user_debt = Sharelist.objects.get_user_debts_per_member(context['sharelist_id'], self.request.user.id)
+        member_to_user_credit = Sharelist.objects.get_user_credits_per_member(context['sharelist_id'], self.request.user.id)
+
+        per_member_summary = [
+            {
+                'id': u.id,
+                'photo': u.profile.photo.url,
+                'username': u.username,
+                'user_debt': member_to_user_debt.get(u.id, Decimal(0.0)),
+                'user_credit': member_to_user_credit.get(u.id, Decimal(0.0)), 
+            }
+            for u in context['active_sharelist'].users.select_related('profile').all()
+            if u.id != self.request.user.id
+        ]
+
+        for entity in per_member_summary:
+            entity['user_balance'] = entity['user_credit'] - entity['user_debt']
+
+        context['per_member_summary'] = per_member_summary
+        context['nbar'] = self.nbar
         return context
 
 

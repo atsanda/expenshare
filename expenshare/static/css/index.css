@@ -8,3 +8,7 @@
     border-bottom-style: solid;
     border-bottom-color:#868e96;
 }
+
+.avatar-img {
+    max-width: 60px;
+}

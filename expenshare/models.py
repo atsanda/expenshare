@@ -55,6 +55,26 @@ class SharelistQuerySet(QuerySet):
         total_debts = Sharelist.objects.values('id').annotate(total_debt=debt_sum).values('id', 'total_debt')
         return {d['id']: d['total_debt'] for d in total_debts}
 
+    def get_user_debts_per_member(self, sharelist_id, user_id):
+        debts = (
+            Debt.objects.filter(credit__sharelist__id=sharelist_id, debtor=user_id)
+                        .values('credit__creditor')
+                        .annotate(debt_amount=Sum('amount'))
+                        .values('credit__creditor', 'debt_amount')
+        )
+        member_to_user_debt = {d['credit__creditor']: d['debt_amount'] for d in debts}
+        return member_to_user_debt
+
+    def get_user_credits_per_member(self, sharelist_id, user_id):
+        credits = (
+            Credit.objects.filter(sharelist__id=sharelist_id, creditor=user_id)
+                            .values('debts__debtor')
+                            .annotate(credit_amount=Sum('debts__amount'))
+                            .values('debts__debtor', 'credit_amount')
+        )
+        member_to_user_credit = {c['debts__debtor']: c['credit_amount'] for c in credits}
+        return member_to_user_credit
+
 
 class Sharelist(models.Model):
     objects = SharelistQuerySet.as_manager()
