@@ -25,6 +25,7 @@ urlpatterns = [
     path('', expenshare.views.index, name='index'),
     path('logout', LogoutView.as_view(next_page='/'), name='logout'),
     path('social/', include('social_django.urls', namespace='social')),
+    path('social/confirm-registration', expenshare.views.ConfirmRegistration.as_view(), name="confirm-registration"),
     path('sharelists/create', expenshare.views.SharelistCreate.as_view(), name="sharelists-create"),
     path('sharelists/<int:sharelist_id>', expenshare.views.SharelistMain.as_view(), name='sharelists-view'),
     path('sharelists/<int:sharelist_id>/summary', expenshare.views.SharelistSummary.as_view(), name='sharelists-summary'),
@@ -32,6 +33,8 @@ urlpatterns = [
     path('sharelists/<int:sharelist_id>/credits/<int:credit_id>', expenshare.views.CreditView.as_view(), name='credits-view'),
     path('sharelists/<int:sharelist_id>/credits/<int:credit_id>/update', expenshare.views.CreditUpdate.as_view(), name='credits-update'),
     path('sharelists/<int:sharelist_id>/credits/<int:credit_id>/delete', expenshare.views.CreditDelete.as_view(), name='credits-delete'),
+    path('policy', expenshare.views.Policy.as_view(), name='policy'),
+    path('terms', expenshare.views.Terms.as_view(), name='terms'),
     path('user-autocomplete/', expenshare.views.UserAutocomplete.as_view(), name='user-autocomplete'),
 ]
 

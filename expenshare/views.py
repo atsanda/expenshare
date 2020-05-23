@@ -7,16 +7,17 @@ from django.urls import reverse
 from expenshare.models import Sharelist, Credit, Debt
 from django.contrib.auth.models import User
 from dal import autocomplete
-from expenshare.forms import SharelistForm, CreditForm
+from expenshare.forms import SharelistForm, CreditForm, RegistrationConfirmationFrom
 from .services import CreditCreateService, CreditInfoService, \
     CreditUpdateService, CreditDeleteService
 from django.http import HttpResponseForbidden, JsonResponse
 from django.core.exceptions import PermissionDenied
+from social_django.utils import load_strategy
 from decimal import Decimal
 
 
 def index(request):
-    sharelists = Sharelist.objects.order_by('id').all()
+    sharelists = request.user.sharelist_set.all()
     total_credits = Sharelist.objects.get_total_credits(request.user.id)
     total_debts = Sharelist.objects.get_total_debts(request.user.id)
 
@@ -210,3 +211,37 @@ class CreditDelete(View):
 
         url = reverse(self.pattern_name, kwargs=kwargs)
         return JsonResponse(data={'success_url': url}, status=200)
+
+
+class Policy(TemplateView):
+    template_name = 'expenshare/policy.html'
+
+
+class Terms(TemplateView):
+    template_name = 'expenshare/terms.html'
+
+
+class ConfirmRegistration(FormView):
+    form_class = RegistrationConfirmationFrom
+    template_name = 'expenshare/confirm-registration.html'
+
+    def get_initial(self):
+        initial = super().get_initial()
+        initial['username'] = self.partial.kwargs['username']
+        initial['email'] = self.partial.kwargs['details']['email']
+        initial['partial_token'] = self.partial.token
+        return initial
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['partial_backend_name'] = self.partial.backend
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        strategy = load_strategy()
+        partial_token = self.request.GET.get('partial_token')
+        self.partial = strategy.partial_load(partial_token)
+        kwargs['photo_url'] = self.partial.kwargs['response']['photo']
+        kwargs['first_name'] = self.partial.kwargs['details']['first_name']
+        return super().get_context_data(**kwargs)
+

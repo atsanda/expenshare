@@ -2,6 +2,14 @@
 
 {% load static %}
 
-{% block container %}
-Welcome to expenshare!
-{% endblock %}  
+{% block body_content %}
+<div class="welcome-background min-vh-100">
+    <header class="welcome-header text-white">
+        <div class="container text-left">
+            <h1 class="text-dark">Welcome to Expenshare</h1>
+            <p class="lead text-secondary">A service to share your expenses with other people</p>
+            <a href="{% url 'social:begin' 'vk-oauth2' %}" class="btn btn-dark welcome-join-button">Join us</a>
+        </div>
+    </header>
+</div>
+{% endblock %}

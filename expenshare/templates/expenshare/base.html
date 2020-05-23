@@ -12,6 +12,7 @@
         <title>Expenshare</title>
 
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
         <link rel="stylesheet" href="{% static 'css/index.css' %}">
         {% block extra_css %}{% endblock %}
     </head>
@@ -56,14 +57,38 @@
         </nav>
 
         {% block body_content %}
-          <div class="container">
+          <div class="container min-vh-100">
             {% block container %}{% endblock %}
           </div>
         {% endblock %}
 
         {% block foot %}
-            <footer>
-                {% block footer %}{% endblock %}
+            <footer class="page-footer font-small bg-dark text-white">
+
+                <div class="container text-center">
+                    <!-- Grid row -->
+                    <div class="row">
+                        <!-- Grid column -->
+                        <div class="col-12 mx-auto">
+                            <ul class="list-unstyled my-2">
+                                <li>
+                                <a href="{% url 'policy' %}">Privacy policy</a>
+                                </li>
+                                <li>
+                                <a href="{% url 'terms' %}">Terms of use</a>
+                                </li>
+                            </ul>
+                        </div>   
+                    </div>
+                    <!-- Grid row -->
+                </div>
+                <!-- Footer Links -->
+                <!-- Copyright -->
+                <div class="footer-copyright text-center py-3">© 2020 Copyright:
+                <a href="https://expenshare.ru"> expenshare.ru</a>
+                </div>
+                <!-- Copyright -->
+            
             </footer>
         {% endblock %}
 
