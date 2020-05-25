@@ -11,6 +11,14 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
+# HSTS should be configured on web server side
+
+# X-Content-Type-Options
+SECURE_CONTENT_TYPE_NOSNIFF = True
+# X-XSS-Protection
+SECURE_BROWSER_XSS_FILTER = True
+# Clickjacking protection
+X_FRAME_OPTIONS = 'DENY'
 
 CACHES = {
     "default": {
