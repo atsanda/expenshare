@@ -37,5 +37,3 @@ urlpatterns = [
     path('terms', expenshare.views.Terms.as_view(), name='terms'),
     path('user-autocomplete/', expenshare.views.UserAutocomplete.as_view(), name='user-autocomplete'),
 ]
-
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
