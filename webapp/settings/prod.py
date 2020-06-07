@@ -33,8 +33,9 @@ CACHES = {
 
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 
-CONN_MAX_AGE = 60
+ALLOWED_HOSTS = ['expenshare.ru']
 
+CONN_MAX_AGE = 60
 
 LOGGING = {
     'version': 1,
@@ -78,7 +79,7 @@ LOGGING = {
 
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DATABASES = {
     'default': {
@@ -90,3 +91,5 @@ DATABASES = {
         'PORT': '',
     }
 }
+
+SOCIAL_AUTH_REDIRECT_IS_HTTPS = True
