@@ -1,0 +1,21 @@
+{% extends 'expenshare/sharelist_view_base.html' %}
+
+{% block content %}
+{% for c in per_member_summary %}
+<div class="row no-gutters align-items-center py-2 border-bottom-2">
+    <div class="col-2">
+      <img class="img-fluid rounded-circle d-block mx-auto avatar-img" src="{{ c.photo }}">
+    </div>
+    <div class="col-7 pl-2">
+      <h5 class="mb-0">{{ c.username }}</h5>
+      <p class="mb-0">Owns you: {{ c.user_credit|floatformat:2 }}
+      <p class="mb-0">You own: {{ c.user_debt|floatformat:2 }}
+    </div>
+    <div class="col-3">
+      <h4 class="text-right font-weight-bold mb-0">
+          {{ c.user_balance|floatformat:2 }}
+      </h4>
+    </div>
+  </div>
+{% endfor %}
+{% endblock %}

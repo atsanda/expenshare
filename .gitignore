@@ -45,6 +45,7 @@ lib64/
 parts/
 sdist/
 var/
+*migrations/
 *.egg-info/
 .installed.cfg
 *.egg
@@ -89,3 +90,9 @@ local_settings.py
 db.sqlite3
 
 .vscode
+
+media
+
+.idea
+
+static
