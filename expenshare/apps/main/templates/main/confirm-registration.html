@@ -1,0 +1,24 @@
+{% extends 'main/base.html' %}
+
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block container %}
+    <div class="row py-4">
+        <div class="col-12">
+            <div class="d-flex">
+                <div>
+                    <img class="img-fluid rounded-circle avatar-img pr-2" src="{{ photo_url }}">
+                </div>
+                <div>
+                    <h4s class="welcome-message">{{ first_name }}, welcome to expenshare!</h4s>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+      <div class="col-12">
+          {% crispy form %}
+      </div>
+    </div>
+{% endblock %}

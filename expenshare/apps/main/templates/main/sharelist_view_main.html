@@ -1,0 +1,50 @@
+{% extends 'main/sharelist_view_base.html' %}
+
+{% block content %}
+{% for credit in page_obj.object_list %}
+<div class="row no-gutters align-items-center py-2 border-bottom-2">
+  <div class="col-2">
+    <img class="img-fluid rounded-circle d-block mx-auto" src="{{ credit.creditor.profile.photo.url }}">
+  </div>
+  <div class="col-7 pl-2">
+    <a href="{% url 'credits-view' sharelist_id credit.id %}">
+      <h5 class="mb-0">{{ credit.name }}</h5>
+    </a>
+    <p class="mb-0">{{ credit.amount }}</p>
+    </div>
+  <div class="col-3">
+    <h4 class="text-right font-weight-bold mb-0">
+        {% if credit.debts.exists %}
+            {{ credit.debts.get.amount }}
+        {% else %}
+            0.0
+        {% endif %}
+    </h4>
+  </div>
+</div>
+{% endfor %}
+<div class="row pt-2 justify-content-center">
+  <div class="col-12">
+      <nav aria-label="Debts page navigation">
+        <ul class="pagination justify-content-center">
+          {% if page_obj.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+                <span class="sr-only">Previous</span>
+            </a>
+          </li>
+          {% endif %}
+          {% if page_obj.has_next %}
+          <li class="page-item">
+          <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Next">
+              <span aria-hidden="true">&raquo;</span>
+              <span class="sr-only">Next</span>
+          </a>
+          </li>
+          {% endif %}
+        </ul>
+      </nav>
+  </div>
+</div>
+{% endblock %}
