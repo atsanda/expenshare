@@ -8,6 +8,7 @@ on:
 
 env:
   python-version: 3.8
+  SECRET_KEY: is_not_always_a_secret
   DB_NAME: github_actions
   DB_USER: postgres
   DB_PASSWORD: postgres
@@ -15,6 +16,28 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+  
+    services:
+      postgres:
+        image: postgres:10.8
+        env:
+          POSTGRES_USER: ${ DB_USER }
+          POSTGRES_PASSWORD: ${ DB_PASSWORD }
+          POSTGRES_DB: ${ DB_NAME }
+        ports:
+          - 5432:5432
+        # needed because the postgres container does not provide a healthcheck
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+      redis:
+        # Docker Hub image
+        image: redis
+        # Set health checks to wait until redis has started
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     
     steps:
     - uses: actions/checkout@v2
