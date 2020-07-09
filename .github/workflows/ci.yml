@@ -8,6 +8,7 @@ on:
 
 env:
   python-version: 3.8
+  SECRET_KEY: is_not_always_a_secret
   DB_NAME: github_actions
   DB_USER: postgres
   DB_PASSWORD: postgres
@@ -15,7 +16,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+  
     services:
       postgres:
         image: postgres:10.8
@@ -37,6 +38,7 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
+    
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python
@@ -51,7 +53,7 @@ jobs:
       run: python manage.py migrate
     - name: Run Tests
       run: |
-        pytest -x --cov=./piq --cov-report=xml
+        pytest -x --cov=./expenshare --cov-report=xml
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1
       with:

@@ -37,6 +37,10 @@ ALLOWED_HOSTS = ['expenshare.ru']
 
 CONN_MAX_AGE = 60
 
+LOG_DIR = os.path.join(BASE_DIR, 'logs')
+if not os.path.exists(LOG_DIR):
+    os.mkdir(LOG_DIR)
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': True,
@@ -49,7 +53,7 @@ LOGGING = {
         'default': {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(BASE_DIR, 'logs', 'default.log'),
+            'filename': os.path.join(LOG_DIR, 'default.log'),
             'maxBytes': 1024*1024*5,  # 5 MB
             'backupCount': 5,
             'formatter':'standard',
@@ -57,7 +61,7 @@ LOGGING = {
         'request_handler': {
                 'level':'DEBUG',
                 'class':'logging.handlers.RotatingFileHandler',
-                'filename': os.path.join(BASE_DIR, 'logs', 'django_request.log'),
+                'filename': os.path.join(LOG_DIR, 'django_request.log'),
                 'maxBytes': 1024*1024*5,  # 5 MB
                 'backupCount': 5,
                 'formatter':'standard',
