@@ -1,5 +1,7 @@
-from django.shortcuts import render
-from django.urls import reverse
+import re
+
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
 
 
 class AuthRequiredMiddleware:
@@ -7,16 +9,15 @@ class AuthRequiredMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        # process only authenticated users and those who wanna login
-        if (request.user.is_authenticated or
-            request.path.startswith('/social/login') or
-            request.path.startswith('/social/complete') or
-            request.path.startswith('/social/confirm-registration') or
-            request.path.startswith('/terms') or
-            request.path.startswith('/policy')
-        ):
+        response = self.get_response(request)
+        return response
 
-            response = self.get_response(request)
-            return response
-        else:
-            return render(request, 'main/welcome.html')
+    def process_view(self, request, view_func, view_args, view_kwargs):
+        if (
+            request.user.is_authenticated or
+            any(map(lambda regex: re.match(regex, request.path), settings.ALLOW_ANONYMOUS_ACCESS))
+        ):
+            return None
+
+        return login_required(view_func)(request, *view_args, **view_kwargs)
+
