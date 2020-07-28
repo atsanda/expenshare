@@ -17,6 +17,9 @@ from decimal import Decimal
 
 
 def index(request):
+    if not request.user.is_authenticated:
+        return render(request, 'main/welcome.html')
+
     sharelists = request.user.sharelist_set.all()
     total_credits = Sharelist.objects.get_total_credits(request.user.id)
     total_debts = Sharelist.objects.get_total_debts(request.user.id)

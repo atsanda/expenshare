@@ -141,3 +141,13 @@ MEDIA_ROOT = 'media'
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 DEBTS_PER_PAGE = 10
+
+LOGIN_URL = 'index'
+ALLOW_ANONYMOUS_ACCESS = [
+    r'^/$',
+    r'^/social/login/.*$',
+    r'^/social/complete/.*$',
+    r'^/social/confirm-registration/.*$',
+    r'^/terms$',
+    r'^/policy$',
+]
