@@ -50,7 +50,9 @@ jobs:
         run:  docker-compose -f local.yml run --rm django python manage.py migrate
 
       - name: Run Django Tests
-        run:  docker-compose -f local.yml run django pytest
+        run: |
+          ci_env=`bash <(curl -s https://codecov.io/env)`
+          docker-compose $ci_env -e CI=true -f local.yml run django "pytest -x --cov=./expenshare --cov-report=xml;./codecov"
 
       - name: Tear down the Stack
         run:  docker-compose -f local.yml down
