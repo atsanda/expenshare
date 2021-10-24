@@ -52,7 +52,7 @@ jobs:
       - name: Run Django Tests
         run: |
           ci_env=`bash <(curl -s https://codecov.io/env)`
-          docker-compose -f local.yml run $ci_env -e CI=true django "pytest -x --cov=./expenshare --cov-report=xml;./codecov"
+          docker-compose -f local.yml run $ci_env -e CI=true django "pytest -x;./codecov"
 
       - name: Tear down the Stack
         run:  docker-compose -f local.yml down
