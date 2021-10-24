@@ -1,8 +1,10 @@
 import pytest
 from pytest_factoryboy import register
 
+from expenshare.users.tests.factories import UserFactory
+
 from ...models import Sharelist
-from .factories import SharelistFactory, UserFactory
+from .factories import SharelistFactory
 
 register(UserFactory)
 register(SharelistFactory)

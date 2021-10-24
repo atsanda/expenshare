@@ -46,7 +46,7 @@ class UserRedirectView(LoginRequiredMixin, RedirectView):
 user_redirect_view = UserRedirectView.as_view()
 
 
-class UserAutocompleteView(autocomplete.Select2QuerySetView):
+class UserAutocompleteView(LoginRequiredMixin, autocomplete.Select2QuerySetView):
 
     model_field_name = "username"
     model = User

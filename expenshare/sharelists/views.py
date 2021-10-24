@@ -2,6 +2,7 @@
 from decimal import Decimal
 
 from django.contrib.auth import get_user_model
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from django.http import HttpResponseForbidden, JsonResponse
@@ -21,7 +22,7 @@ from .services import (
 User = get_user_model()
 
 
-class SharelistCreate(CreateView):
+class SharelistCreate(LoginRequiredMixin, CreateView):
     model = Sharelist
     template_name = "sharelists/sharelist_create.html"
     success_url = "/"
@@ -33,7 +34,7 @@ class SharelistCreate(CreateView):
         return super().form_valid(form, *args, **kwargs)
 
 
-class SharelistMain(TemplateView):
+class SharelistMain(LoginRequiredMixin, TemplateView):
     template_name = "sharelists/sharelist_view_main.html"
     nbar = "main"
     pagination_limit = 10
@@ -57,7 +58,7 @@ class SharelistMain(TemplateView):
         return context
 
 
-class SharelistSummary(TemplateView):
+class SharelistSummary(LoginRequiredMixin, TemplateView):
     template_name = "sharelists/sharelist_view_summary.html"
     nbar = "summary"
 
@@ -91,7 +92,7 @@ class SharelistSummary(TemplateView):
         return context
 
 
-class CreditFormView(FormView):
+class CreditFormView(LoginRequiredMixin, FormView):
     form_class = CreditForm
 
     def get_form_kwargs(self):
@@ -171,7 +172,7 @@ class CreditUpdate(CreditFormView):
         return super().form_valid(form)
 
 
-class CreditView(TemplateView):
+class CreditView(LoginRequiredMixin, TemplateView):
     template_name = "sharelists/credit_view.html"
 
     def get_context_data(self, **kwargs):
@@ -185,7 +186,7 @@ class CreditView(TemplateView):
         return context
 
 
-class CreditDelete(View):
+class CreditDelete(LoginRequiredMixin, View):
     pattern_name = "sharelists:view"
 
     def delete(self, request, *args, **kwargs):

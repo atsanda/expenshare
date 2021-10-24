@@ -5,12 +5,9 @@ import pytest
 @pytest.mark.parametrize(
     "url,expected_status_code,expected_template_name",
     [
-        ("/", 200, "main/welcome.html"),
-        ("/terms", 200, "main/terms.html"),
-        ("/policy", 200, "main/policy.html"),
-        ("/sharelists/1", 200, "main/welcome.html"),
-        ("/user-autocomplete", 200, "main/welcome.html"),
-        ("/sharelists/create", 200, "main/welcome.html"),
+        ("/sharelists/1", 200, "index/welcome.html"),
+        ("/users/autocomplete/search", 200, "index/welcome.html"),
+        ("/sharelists/create", 200, "index/welcome.html"),
     ],
 )
 def test_unathorised_access(url, expected_status_code, expected_template_name, client):
