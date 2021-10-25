@@ -1,0 +1,64 @@
+/* These styles are generated from project.scss. */
+
+.alert-debug {
+  color: black;
+  background-color: white;
+  border-color: #d6e9c6;
+}
+
+.alert-error {
+  color: #b94a48;
+  background-color: #f2dede;
+  border-color: #eed3d7;
+}
+
+.create-sharelist-img {
+  height: 30%;
+  width: auto;
+}
+
+.border-bottom-2 {
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  border-bottom-color:#868e96;
+}
+
+.avatar-img {
+  max-width: 60px;
+}
+
+.h2-counter h1 {
+  counter-reset: h2counter;
+}
+.h2-counter h2:before {
+  content: counter(h2counter) ".\0000a0";
+  counter-increment: h2counter;
+}
+
+.min-vh-100 {
+  min-height: 100vh;
+}
+
+.welcome-message {
+  font-size: 1.5rem;
+}
+
+.welcome-background {
+  background-image: url("/static/images/welcome-background.jpg");
+  background-size: cover;
+  background-position: 66%;
+  background-repeat: no-repeat;
+}
+
+.welcome-header {
+  padding: 100px 0 100px
+}
+
+@media (min-width: 992px) {
+  .welcome-header {
+      padding: 156px 0 100px;
+  }
+  .welcome-background {
+      background-position: center;
+  }
+}

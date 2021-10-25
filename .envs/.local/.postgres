@@ -1,0 +1,7 @@
+# PostgreSQL
+# ------------------------------------------------------------------------------
+POSTGRES_HOST=postgres
+POSTGRES_PORT=5432
+POSTGRES_DB=expenshare
+POSTGRES_USER=OoHrRXtydQUwlUjVKNBDDTzuQtXYKsWd
+POSTGRES_PASSWORD=lSqIor2OSECZXlFcosdsfCf9DpsPivqi5hEfll6iB3uqn9rdVXgTVALABjvuAfP0
