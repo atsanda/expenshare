@@ -77,10 +77,8 @@ class Sharelist(models.Model):
 class CreditQuerySet(QuerySet):
     def get_sharelist_credits_with_user_debt(self, user_id, sharelist_id):
         usr_debts = Debt.objects.filter(debtor_id=user_id)
-        qs = (
-            self.filter(sharelist_id=sharelist_id)
-            .select_related("creditor__profile")
-            .prefetch_related(Prefetch("debts", usr_debts))
+        qs = self.filter(sharelist_id=sharelist_id).prefetch_related(
+            Prefetch("debts", usr_debts)
         )
         return qs
 
